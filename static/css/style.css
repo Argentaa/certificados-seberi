@@ -1,0 +1,70 @@
+/* Custom styles for Certificados Seberi */
+@layer base {
+    html {
+        scroll-behavior: smooth;
+    }
+    body {
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+}
+
+[x-cloak] {
+    display: none !important;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+::-webkit-scrollbar-thumb {
+    background: #0d5e2e;
+    border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #0a4d25;
+}
+
+/* Input focus styles */
+input:focus {
+    outline: none;
+}
+
+/* Smooth transitions for all interactive elements */
+button, a {
+    transition: all 0.2s ease;
+}
+
+/* Table row hover effect */
+tbody tr {
+    transition: background-color 0.15s ease;
+}
+
+/* Toast animation */
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+.fixed.bottom-6.right-6 {
+    animation: slideInRight 0.3s ease-out;
+}
+
+/* Stats card subtle hover */
+.grid-cols-2 > div, .grid-cols-4 > div {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.grid-cols-2 > div:hover, .grid-cols-4 > div:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
