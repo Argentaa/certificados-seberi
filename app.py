@@ -405,8 +405,13 @@ def preview_certificate(filename):
 @app.route("/admin/login", methods=["GET", "POST"])
 def admin_login():
     if request.method == "POST":
-        data = request.get_json() or request.form
-        password = data.get("password", "")
+        # Tenta JSON primeiro (API), depois form (HTML)
+        if request.is_json:
+            data = request.get_json(silent=True) or {}
+            password = data.get("password", "")
+        else:
+            password = request.form.get("password", "")
+
         if password == app.config["ADMIN_PASSWORD"]:
             session["admin_logged_in"] = True
             if request.is_json:
