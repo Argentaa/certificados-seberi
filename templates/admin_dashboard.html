@@ -6,9 +6,8 @@
     <!-- Sidebar -->
     <div class="fixed inset-y-0 left-0 w-64 bg-primary-500 shadow-lg hidden lg:block">
         <div class="flex items-center gap-3 px-6 h-20 border-b border-primary-400">
-            <div class="w-9 h-9 bg-white rounded-full flex items-center justify-center">
-                <span class="text-primary-500 font-bold">S</span>
-            </div>
+            <img src="{{ url_for('static', filename='logo-seberi.png') }}"
+                 alt="Prefeitura Seberi" class="w-9 h-9 rounded-full object-cover">
             <div>
                 <p class="text-white font-semibold text-sm">Prefeitura de Seberi</p>
                 <p class="text-primary-200 text-xs">Certificados Digitais</p>
@@ -48,9 +47,8 @@
     <!-- Mobile header -->
     <div class="lg:hidden bg-primary-500 px-4 py-4 flex items-center justify-between">
         <div class="flex items-center gap-3">
-            <div class="w-8 h-8 bg-white rounded-full flex items-center justify-center">
-                <span class="text-primary-500 font-bold text-sm">S</span>
-            </div>
+            <img src="{{ url_for('static', filename='logo-seberi.png') }}"
+                 alt="Prefeitura Seberi" class="w-8 h-8 rounded-full object-cover">
             <span class="text-white font-semibold">Certificados Seberi</span>
         </div>
         <div class="flex gap-2">
