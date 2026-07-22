@@ -15,7 +15,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 # Cria diretórios necessários
-RUN mkdir -p instance certificates
+RUN mkdir -p instance certificates template_data
 
 # Expõe a porta do gunicorn
 EXPOSE 5000

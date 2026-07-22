@@ -10,6 +10,7 @@ services:
     volumes:
       - cert_data:/app/instance
       - cert_certificates:/app/certificates
+      - cert_template:/app/template_data
     environment:
       - TZ=America/Sao_Paulo
 
@@ -18,3 +19,5 @@ volumes:
     name: certificados_seberi_data
   cert_certificates:
     name: certificados_seberi_certificates
+  cert_template:
+    name: certificados_seberi_template

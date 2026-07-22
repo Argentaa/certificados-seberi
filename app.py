@@ -33,7 +33,8 @@ def hex_to_rgb(hex_color):
     return tuple(int(hex_color[i : i + 2], 16) for i in (0, 2, 4))
 
 
-TEMPLATE_CONFIG_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "template_config.json")
+TEMPLATE_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "template_data")
+TEMPLATE_CONFIG_PATH = os.path.join(TEMPLATE_DIR, "template_config.json")
 
 
 def get_template_config():
@@ -50,6 +51,7 @@ def get_template_config():
 
 def save_template_config(config):
     """Salva as configurações do template."""
+    os.makedirs(TEMPLATE_DIR, exist_ok=True)
     with open(TEMPLATE_CONFIG_PATH, "w") as f:
         json.dump(config, f, indent=2)
 
@@ -76,8 +78,8 @@ def generate_certificate(registration):
     output_dir = os.path.join(app.root_path, "certificates")
     os.makedirs(output_dir, exist_ok=True)
 
-    template_pdf = os.path.join(app.root_path, "certificate_template.pdf")
-    template_png = os.path.join(app.root_path, "certificate_template.png")
+    template_pdf = os.path.join(TEMPLATE_DIR, "certificate_template.pdf")
+    template_png = os.path.join(TEMPLATE_DIR, "certificate_template.png")
 
     name = registration.name.upper().strip()
 
@@ -439,8 +441,9 @@ def admin_template():
     """Página de configuração do template (upload + posição do nome)."""
     config = get_template_config()
     template_exists = os.path.exists(
-        os.path.join(app.root_path, "certificate_template.png")
+        os.path.join(TEMPLATE_DIR, "certificate_template.png")
     )
+
     return render_template(
         "admin_template.html",
         config=config,
@@ -453,7 +456,7 @@ def admin_template():
 def api_get_template():
     """Retorna info do template atual."""
     config = get_template_config()
-    template_path = os.path.join(app.root_path, "certificate_template.png")
+    template_path = os.path.join(TEMPLATE_DIR, "certificate_template.png")
     exists = os.path.exists(template_path)
     return jsonify({
         "success": True,
@@ -466,7 +469,7 @@ def api_get_template():
 @require_admin
 def api_template_image():
     """Serve a imagem do template para o coordinate picker."""
-    template_path = os.path.join(app.root_path, "certificate_template.png")
+    template_path = os.path.join(TEMPLATE_DIR, "certificate_template.png")
     if not os.path.exists(template_path):
         return jsonify({"success": False, "message": "Template não encontrado."}), 404
     return send_file(template_path, mimetype="image/png")
@@ -486,8 +489,9 @@ def api_upload_template():
     if not file.filename.lower().endswith((".png", ".jpg", ".jpeg", ".webp")):
         return jsonify({"success": False, "message": "Formato inválido. Use PNG, JPG ou WebP."}), 400
 
-    # Salva como certificate_template.png
-    template_path = os.path.join(app.root_path, "certificate_template.png")
+    # Salva como certificate_template.png na pasta persistente
+    os.makedirs(TEMPLATE_DIR, exist_ok=True)
+    template_path = os.path.join(TEMPLATE_DIR, "certificate_template.png")
     file.save(template_path)
 
     # Atualiza config
