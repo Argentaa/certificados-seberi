@@ -1,0 +1,30 @@
+services:
+  app:
+    build: .
+    container_name: certificados-seberi
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:5000:5000"
+    env_file:
+      - .env
+    volumes:
+      - ./instance:/app/instance
+      - ./certificates:/app/certificates
+      - ./certificate_template.png:/app/certificate_template.png
+    environment:
+      - TZ=America/Sao_Paulo
+
+  nginx:
+    image: nginx:alpine
+    container_name: certificados-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./certificates:/app/certificates:ro
+      # SSL (crie a pasta ssl/ com seus certificados)
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - app

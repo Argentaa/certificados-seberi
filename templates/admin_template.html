@@ -1,0 +1,508 @@
+{% extends "base.html" %}
+{% block title %}Configurar Template - Certificados Seberi{% endblock %}
+
+{% block extra_head %}
+<style>
+.crosshair-cursor { cursor: crosshair; }
+.position-marker {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    z-index: 10;
+}
+.position-marker::before,
+.position-marker::after {
+    content: '';
+    position: absolute;
+    background: #ef4444;
+}
+.position-marker::before {
+    width: 2px;
+    height: 100%;
+    left: 50%;
+    top: 0;
+}
+.position-marker::after {
+    width: 100%;
+    height: 2px;
+    top: 50%;
+    left: 0;
+}
+.position-marker .dot {
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    background: #ef4444;
+    border: 2px solid #fff;
+    border-radius: 50%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+.position-label {
+    position: absolute;
+    top: -28px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #ef4444;
+    color: white;
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    white-space: nowrap;
+    pointer-events: none;
+}
+#preview-name {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    z-index: 5;
+    font-weight: bold;
+    color: rgba(0,0,0,0.6);
+    text-shadow: 0 0 4px rgba(255,255,255,0.8);
+    text-align: center;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50">
+    <!-- Sidebar (same as dashboard) -->
+    <div class="fixed inset-y-0 left-0 w-64 bg-primary-500 shadow-lg hidden lg:block">
+        <div class="flex items-center gap-3 px-6 h-20 border-b border-primary-400">
+            <div class="w-9 h-9 bg-white rounded-full flex items-center justify-center">
+                <span class="text-primary-500 font-bold">S</span>
+            </div>
+            <div>
+                <p class="text-white font-semibold text-sm">Prefeitura de Seberi</p>
+                <p class="text-primary-200 text-xs">Certificados Digitais</p>
+            </div>
+        </div>
+        <nav class="px-4 py-6 space-y-1">
+            <a href="/admin" class="flex items-center gap-3 px-4 py-3 text-white/70 hover:text-white hover:bg-white/5 rounded-xl transition-colors text-sm">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
+                </svg>
+                Dashboard
+            </a>
+            <a href="/admin/template" class="flex items-center gap-3 px-4 py-3 bg-white/10 rounded-xl text-white font-medium">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                </svg>
+                Template
+            </a>
+            <a href="/" target="_blank" class="flex items-center gap-3 px-4 py-3 text-white/70 hover:text-white hover:bg-white/5 rounded-xl transition-colors text-sm">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+                </svg>
+                Ver site público
+            </a>
+            <a href="/admin/logout" class="flex items-center gap-3 px-4 py-3 text-white/70 hover:text-white hover:bg-white/5 rounded-xl transition-colors text-sm">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                </svg>
+                Sair
+            </a>
+        </nav>
+    </div>
+
+    <!-- Mobile header -->
+    <div class="lg:hidden bg-primary-500 px-4 py-4 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+            <div class="w-8 h-8 bg-white rounded-full flex items-center justify-center">
+                <span class="text-primary-500 font-bold text-sm">S</span>
+            </div>
+            <span class="text-white font-semibold">Configurar Template</span>
+        </div>
+    </div>
+
+    <!-- Main -->
+    <div class="lg:ml-64">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+            
+            <!-- Header -->
+            <div class="mb-8">
+                <h1 class="text-2xl font-bold text-gray-800">Configurar Template do Certificado</h1>
+                <p class="text-gray-500 text-sm mt-1">Faça upload da imagem e clique onde o nome deve aparecer</p>
+            </div>
+
+            <!-- Step 1: Upload -->
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 mb-6">
+                <h2 class="text-lg font-semibold text-gray-800 mb-4">1. Enviar imagem do certificado</h2>
+                <div class="flex items-center gap-4">
+                    <input type="file" id="file-input" accept="image/png,image/jpeg,image/webp"
+                           class="block w-full text-sm text-gray-500 file:mr-4 file:py-2.5 file:px-5
+                                  file:rounded-xl file:border-0 file:text-sm file:font-medium
+                                  file:bg-primary-50 file:text-primary-700
+                                  hover:file:bg-primary-100 transition-colors">
+                    <button id="upload-btn"
+                            class="px-6 py-2.5 bg-primary-500 text-white rounded-xl font-medium
+                                   hover:bg-primary-600 transition-colors disabled:opacity-50"
+                            disabled>
+                        Enviar
+                    </button>
+                </div>
+                <p id="upload-status" class="text-sm mt-2 hidden"></p>
+            </div>
+
+            <!-- Step 2: Click to set position -->
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 mb-6">
+                <h2 class="text-lg font-semibold text-gray-800 mb-1">2. Clicar na imagem para definir a posição do nome</h2>
+                <p class="text-sm text-gray-500 mb-4">Clique no local exato onde o nome do participante deve aparecer. Um marcador vermelho será mostrado.</p>
+
+                <div id="template-container" class="relative inline-block max-w-full {% if not template_exists %}hidden{% endif %}">
+                    <img id="template-img"
+                         src="{{ url_for('preview_certificate', filename='../certificate_template.png') if template_exists else '' }}"
+                         class="w-full h-auto rounded-lg border border-gray-200 crosshair-cursor"
+                         alt="Template do certificado"
+                         style="max-height: 70vh; object-fit: contain;">
+
+                    <!-- Marker -->
+                    <div id="position-marker" class="position-marker hidden">
+                        <div class="dot"></div>
+                        <div class="position-label" id="position-label">x: 0, y: 0</div>
+                    </div>
+
+                    <!-- Name preview -->
+                    <div id="preview-name" class="hidden">NOME DO PARTICIPANTE</div>
+                </div>
+
+                <div id="no-template-msg" class="{% if template_exists %}hidden{% endif %}">
+                    <div class="text-center py-12 text-gray-400">
+                        <svg class="w-16 h-16 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                        </svg>
+                        <p class="text-lg font-medium text-gray-500">Nenhum template enviado</p>
+                        <p class="text-sm mt-1">Faça o upload de uma imagem do certificado usando o campo acima.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 3: Config -->
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 mb-6">
+                <h2 class="text-lg font-semibold text-gray-800 mb-4">3. Ajustes finos</h2>
+
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Posição X (horizontal)</label>
+                        <input type="number" id="pos-x"
+                               class="w-full px-3 py-2 border border-gray-300 rounded-xl text-sm"
+                               placeholder="Centralizado">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Posição Y (vertical)</label>
+                        <input type="number" id="pos-y"
+                               class="w-full px-3 py-2 border border-gray-300 rounded-xl text-sm"
+                               placeholder="Ex: 453">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Tamanho da fonte</label>
+                        <input type="number" id="font-size"
+                               class="w-full px-3 py-2 border border-gray-300 rounded-xl text-sm"
+                               value="44" min="10" max="120">
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-3">
+                    <button id="save-pos-btn"
+                            class="px-6 py-2.5 bg-primary-500 text-white rounded-xl font-medium
+                                   hover:bg-primary-600 transition-colors disabled:opacity-50"
+                            disabled>
+                        💾 Salvar posição
+                    </button>
+                    <button id="test-preview-btn"
+                            class="px-6 py-2.5 bg-gray-100 text-gray-700 rounded-xl font-medium
+                                   hover:bg-gray-200 transition-colors disabled:opacity-50"
+                            disabled>
+                        👁 Pré-visualizar
+                    </button>
+                    <span id="save-status" class="text-sm text-gray-500 hidden"></span>
+                </div>
+            </div>
+
+            <!-- Info -->
+            <div class="bg-blue-50 border border-blue-200 rounded-2xl p-5">
+                <div class="flex gap-3">
+                    <svg class="w-5 h-5 text-blue-500 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    <div class="text-sm text-blue-800">
+                        <p class="font-medium mb-1">Como funciona:</p>
+                        <ol class="list-decimal list-inside space-y-1 text-blue-700">
+                            <li>Envie a imagem do certificado (sem nome do participante)</li>
+                            <li>Clique na imagem exatamente onde o nome deve aparecer (topo-esquerda do nome)</li>
+                            <li>Ajuste o tamanho da fonte se necessário</li>
+                            <li>Salve e o sistema usará essas coordenadas ao gerar certificados</li>
+                            <li>O X fica em branco = nome centralizado horizontalmente</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div id="toast" class="fixed bottom-6 right-6 max-w-sm z-50 hidden">
+        <div class="rounded-xl shadow-xl p-4 border bg-green-50 border-green-200">
+            <p class="text-sm font-medium text-green-800" id="toast-msg"></p>
+        </div>
+    </div>
+</div>
+
+<script>
+const IMG_PATH = '/certificates/../certificate_template.png';
+
+// State
+let currentX = null;
+let currentY = null;
+let scale = 1;
+
+// Elements
+const fileInput = document.getElementById('file-input');
+const uploadBtn = document.getElementById('upload-btn');
+const uploadStatus = document.getElementById('upload-status');
+const templateContainer = document.getElementById('template-container');
+const templateImg = document.getElementById('template-img');
+const noTemplateMsg = document.getElementById('no-template-msg');
+const marker = document.getElementById('position-marker');
+const positionLabel = document.getElementById('position-label');
+const previewName = document.getElementById('preview-name');
+const posX = document.getElementById('pos-x');
+const posY = document.getElementById('pos-y');
+const fontSize = document.getElementById('font-size');
+const saveBtn = document.getElementById('save-pos-btn');
+const previewBtn = document.getElementById('test-preview-btn');
+const saveStatus = document.getElementById('save-status');
+
+// ── Enable upload button when file selected ──
+fileInput.addEventListener('change', () => {
+    uploadBtn.disabled = !fileInput.files.length;
+});
+
+// ── Upload ──
+uploadBtn.addEventListener('click', async () => {
+    const file = fileInput.files[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    uploadBtn.disabled = true;
+    uploadBtn.textContent = 'Enviando...';
+    uploadStatus.className = 'text-sm mt-2 text-gray-500';
+    uploadStatus.textContent = 'Enviando...';
+    uploadStatus.classList.remove('hidden');
+
+    try {
+        const res = await fetch('/admin/api/template/upload', { method: 'POST', body: formData });
+        const data = await res.json();
+
+        if (data.success) {
+            uploadStatus.className = 'text-sm mt-2 text-green-600';
+            uploadStatus.textContent = '✅ Template enviado!';
+            // Reload image with cache buster
+            templateImg.src = IMG_PATH + '?t=' + Date.now();
+            templateContainer.classList.remove('hidden');
+            noTemplateMsg.classList.add('hidden');
+            enableControls();
+        } else {
+            uploadStatus.className = 'text-sm mt-2 text-red-600';
+            uploadStatus.textContent = '❌ ' + (data.message || 'Erro ao enviar.');
+        }
+    } catch (err) {
+        uploadStatus.className = 'text-sm mt-2 text-red-600';
+        uploadStatus.textContent = '❌ Erro de conexão.';
+    } finally {
+        uploadBtn.disabled = false;
+        uploadBtn.textContent = 'Enviar';
+    }
+});
+
+// ── Click on image to set position ──
+templateImg.addEventListener('click', (e) => {
+    const rect = templateImg.getBoundingClientRect();
+    scale = templateImg.naturalWidth / rect.width;
+
+    const clickX = Math.round((e.clientX - rect.left) * scale);
+    const clickY = Math.round((e.clientY - rect.top) * scale);
+
+    currentX = clickX;
+    currentY = clickY;
+
+    // Update marker position on screen
+    const markerX = e.clientX - rect.left;
+    const markerY = e.clientY - rect.top;
+    marker.style.left = markerX + 'px';
+    marker.style.top = markerY + 'px';
+    marker.classList.remove('hidden');
+    positionLabel.textContent = `x: ${clickX}, y: ${clickY}`;
+
+    // Update inputs
+    posX.value = clickX;
+    posY.value = clickY;
+
+    // Preview name
+    updatePreview(clickX, clickY);
+
+    enableControls();
+    saveStatus.className = 'text-sm text-gray-500 hidden';
+});
+
+// ── Live preview when inputs change ──
+[posX, posY, fontSize].forEach(el => {
+    el.addEventListener('input', () => {
+        const y = parseInt(posY.value);
+        const x = parseInt(posX.value);
+        if (!isNaN(y)) {
+            currentY = y;
+            currentX = isNaN(x) ? null : x;
+            updatePreview(currentX, currentY);
+            marker.classList.add('hidden');
+            enableControls();
+        }
+    });
+});
+
+// ── Preview name overlay ──
+function updatePreview(x, y) {
+    const rect = templateImg.getBoundingClientRect();
+    scale = templateImg.naturalWidth / rect.width;
+
+    const fs = parseInt(fontSize.value) || 44;
+    const previewFs = Math.round(fs / scale);
+
+    previewName.style.left = (x ? x / scale : rect.width / 2) + 'px';
+    previewName.style.top = (y / scale) + 'px';
+    previewName.style.fontSize = previewFs + 'px';
+    previewName.classList.remove('hidden');
+}
+
+// ── Preview button ──
+previewBtn.addEventListener('click', () => {
+    const y = parseInt(posY.value);
+    const x = parseInt(posX.value);
+    if (!isNaN(y)) {
+        currentY = y;
+        currentX = isNaN(x) ? null : x;
+        updatePreview(currentX, currentY);
+        showToast('Pré-visualização atualizada');
+    }
+});
+
+// ── Save position ──
+saveBtn.addEventListener('click', async () => {
+    const y = parseInt(posY.value);
+    if (isNaN(y)) {
+        showToast('Defina a posição Y primeiro.', 'error');
+        return;
+    }
+
+    const x = posX.value ? parseInt(posX.value) : null;
+    const fs = parseInt(fontSize.value) || 44;
+
+    saveBtn.disabled = true;
+    saveBtn.textContent = 'Salvando...';
+
+    try {
+        const res = await fetch('/admin/api/template/position', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ x, y, font_size: fs }),
+        });
+        const data = await res.json();
+
+        if (data.success) {
+            saveStatus.className = 'text-sm text-green-600';
+            saveStatus.textContent = '✅ Posição salva! (x=' + (x || 'centro') + ', y=' + y + ')';
+            saveStatus.classList.remove('hidden');
+            showToast('✅ Posição salva com sucesso!');
+        } else {
+            saveStatus.className = 'text-sm text-red-600';
+            saveStatus.textContent = '❌ ' + (data.message || 'Erro ao salvar.');
+            saveStatus.classList.remove('hidden');
+        }
+    } catch (err) {
+        saveStatus.className = 'text-sm text-red-600';
+        saveStatus.textContent = '❌ Erro de conexão.';
+        saveStatus.classList.remove('hidden');
+    } finally {
+        saveBtn.disabled = false;
+        saveBtn.textContent = '💾 Salvar posição';
+    }
+});
+
+// ── Utils ──
+function enableControls() {
+    saveBtn.disabled = false;
+    previewBtn.disabled = false;
+}
+
+function showToast(message, type = 'success') {
+    const toast = document.getElementById('toast');
+    const msg = document.getElementById('toast-msg');
+    const div = toast.querySelector('div');
+    msg.textContent = message;
+
+    if (type === 'error') {
+        div.className = 'rounded-xl shadow-xl p-4 border bg-red-50 border-red-200';
+        msg.className = 'text-sm font-medium text-red-800';
+    } else {
+        div.className = 'rounded-xl shadow-xl p-4 border bg-green-50 border-green-200';
+        msg.className = 'text-sm font-medium text-green-800';
+    }
+
+    toast.classList.remove('hidden');
+    setTimeout(() => toast.classList.add('hidden'), 4000);
+}
+
+// ── Load saved config on page load ──
+(async function loadConfig() {
+    try {
+        const res = await fetch('/admin/api/template');
+        const data = await res.json();
+        if (data.success && data.config) {
+            const cfg = data.config;
+            if (cfg.name_y) {
+                posY.value = cfg.name_y;
+                currentY = cfg.name_y;
+            }
+            if (cfg.name_x) {
+                posX.value = cfg.name_x;
+                currentX = cfg.name_x;
+            }
+            if (cfg.font_size) {
+                fontSize.value = cfg.font_size;
+            }
+
+            if (data.exists && cfg.name_y) {
+                enableControls();
+                // Show marker and preview
+                setTimeout(() => {
+                    const x = cfg.name_x;
+                    const y = cfg.name_y;
+                    updatePreview(x, y);
+
+                    // Position marker
+                    const rect = templateImg.getBoundingClientRect();
+                    scale = templateImg.naturalWidth / rect.width;
+                    if (x && y) {
+                        marker.style.left = (x / scale) + 'px';
+                        marker.style.top = (y / scale) + 'px';
+                        marker.classList.remove('hidden');
+                        positionLabel.textContent = `x: ${x}, y: ${y}`;
+                    }
+                }, 500);
+            }
+        }
+    } catch (e) {
+        // Ignore
+    }
+})();
+</script>
+{% endblock %}
