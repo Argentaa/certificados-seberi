@@ -78,13 +78,6 @@
                 <p class="text-gray-500 mb-2" id="successName"></p>
                 <p class="text-sm text-gray-400 mb-8">Seu certificado digital está pronto para download.</p>
 
-                <!-- Preview -->
-                <div class="bg-gray-50 rounded-xl p-4 mb-8 border border-gray-200" style="min-height: 200px;">
-                    <embed id="certPreview" src="" type="application/pdf"
-                           class="w-full rounded-lg shadow-sm border border-gray-200"
-                           style="min-height: 400px;">
-                </div>
-
                 <a id="downloadBtn"
                    class="inline-flex items-center gap-3 bg-primary-500 hover:bg-primary-600 text-white font-semibold py-4 px-8 rounded-xl transition-all duration-200 shadow-lg shadow-primary-500/25 hover:shadow-xl cursor-pointer text-lg">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -160,7 +153,6 @@ const loadingCard = document.getElementById('loadingCard');
 const errorCard = document.getElementById('errorCard');
 const errorText = document.getElementById('errorText');
 const successName = document.getElementById('successName');
-const certPreview = document.getElementById('certPreview');
 const downloadBtn = document.getElementById('downloadBtn');
 
 form.addEventListener('submit', async function(e) {
@@ -195,7 +187,6 @@ form.addEventListener('submit', async function(e) {
 
         if (data.success) {
             successName.textContent = name;
-            certPreview.src = data.download_url.replace('/certificates/', '/certificates/preview/');
             downloadBtn.href = data.download_url;
             successCard.classList.remove('hidden');
         } else {
