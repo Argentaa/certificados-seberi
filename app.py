@@ -185,12 +185,10 @@ def generate_certificate(registration):
                 font=font,
             )
 
-            filename = f"certificado_{registration.id}_{uuid.uuid4().hex[:8]}.png"
+            filename = f"certificado_{registration.id}_{uuid.uuid4().hex[:8]}.pdf"
             output_path = os.path.join(output_dir, filename)
-            img.save(output_path, "PNG")
+            img.save(output_path, "PDF", quality=90)
             return output_path, None
-
-        # ── 3) Gera do zero ──────────────────────────────────────────────
         WIDTH, HEIGHT = 2480, 3508  # A4 em 300dpi
         GREEN = hex_to_rgb("#0d5e2e")
         LIGHT_GREEN = hex_to_rgb("#e8f5e9")
@@ -307,9 +305,9 @@ def generate_certificate(registration):
             data_texto, fill=GRAY, font=font_body,
         )
 
-        filename = f"certificado_{registration.id}_{uuid.uuid4().hex[:8]}.png"
+        filename = f"certificado_{registration.id}_{uuid.uuid4().hex[:8]}.pdf"
         output_path = os.path.join(output_dir, filename)
-        img.save(output_path, "PNG")
+        img.save(output_path, "PDF", quality=90)
         return output_path, None
 
     except Exception as e:
