@@ -242,7 +242,7 @@ def generate_certificate(registration):
             fill=GREEN, font=font_title, anchor="mm",
         )
         draw.text(
-            (WIDTH // 2, 700), "Administração 2021-2028",
+            (WIDTH // 2, 700), "Administração 2025-2028",
             fill=GRAY, font=font_sub, anchor="mm",
         )
 
