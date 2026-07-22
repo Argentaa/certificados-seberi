@@ -464,6 +464,16 @@ def api_get_template():
     })
 
 
+@app.route("/admin/api/template/image")
+@require_admin
+def api_template_image():
+    """Serve a imagem do template para o coordinate picker."""
+    template_path = os.path.join(app.root_path, "certificate_template.png")
+    if not os.path.exists(template_path):
+        return jsonify({"success": False, "message": "Template não encontrado."}), 404
+    return send_file(template_path, mimetype="image/png")
+
+
 @app.route("/admin/api/template/upload", methods=["POST"])
 @require_admin
 def api_upload_template():

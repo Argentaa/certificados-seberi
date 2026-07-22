@@ -157,7 +157,7 @@
 
                 <div id="template-container" class="relative inline-block max-w-full {% if not template_exists %}hidden{% endif %}">
                     <img id="template-img"
-                         src="{{ url_for('preview_certificate', filename='../certificate_template.png') if template_exists else '' }}"
+                         src="{{ url_for('api_template_image') }}"
                          class="w-full h-auto rounded-lg border border-gray-200 crosshair-cursor"
                          alt="Template do certificado"
                          style="max-height: 70vh; object-fit: contain;">
@@ -256,7 +256,7 @@
 </div>
 
 <script>
-const IMG_PATH = '/certificates/../certificate_template.png';
+const IMG_PATH = '/admin/api/template/image';
 
 // State
 let currentX = null;
