@@ -76,6 +76,46 @@
                 </div>
             </div>
 
+            <!-- Manual Generate Card -->
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 mb-8">
+                <h2 class="text-lg font-semibold text-gray-800 mb-1">Gerar certificado manualmente</h2>
+                <p class="text-sm text-gray-500 mb-4">Digite o nome da pessoa e clique em Gerar</p>
+                <div class="flex flex-col sm:flex-row gap-3">
+                    <input type="text" id="manual-name" x-model="manualName"
+                           @keydown.enter="generateManual()"
+                           placeholder="Nome completo do participante..."
+                           class="flex-1 px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm">
+                    <button @click="generateManual()" :disabled="manualLoading"
+                            class="px-6 py-2.5 bg-primary-500 hover:bg-primary-600 disabled:opacity-50 text-white font-medium rounded-xl transition-colors">
+                        <span x-show="!manualLoading">🎯 Gerar certificado</span>
+                        <span x-show="manualLoading" class="flex items-center gap-2">
+                            <svg class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+                            </svg>
+                            Gerando...
+                        </span>
+                    </button>
+                </div>
+                <!-- Result -->
+                <div x-show="manualResult.show" x-cloak
+                     class="mt-4 p-4 rounded-xl border"
+                     :class="manualResult.success ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'">
+                    <p class="text-sm font-medium" :class="manualResult.success ? 'text-green-800' : 'text-red-800'"
+                       x-text="manualResult.message"></p>
+                    <div x-show="manualResult.success" class="mt-3 flex gap-2">
+                        <a :href="manualResult.previewUrl" target="_blank"
+                           class="px-4 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-medium rounded-lg transition-colors">
+                            👁 Visualizar
+                        </a>
+                        <a :href="manualResult.downloadUrl"
+                           class="px-4 py-1.5 bg-primary-500 hover:bg-primary-600 text-white text-sm font-medium rounded-lg transition-colors">
+                            ⬇ Baixar PDF
+                        </a>
+                    </div>
+                </div>
+            </div>
+
             <!-- Stats Cards -->
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
                 <div class="bg-white rounded-xl p-5 border border-gray-100 shadow-sm">
@@ -195,6 +235,9 @@ function dashboard() {
         loading: true,
         search: '',
         toast: { show: false, message: '', type: 'success' },
+        manualName: '',
+        manualLoading: false,
+        manualResult: { show: false, success: false, message: '', downloadUrl: '', previewUrl: '' },
 
         init() {
             this.loadRegistrations();
@@ -245,6 +288,41 @@ function dashboard() {
                 }
             } catch (err) {
                 this.showToast('Erro ao excluir.', 'error');
+            }
+        },
+
+        async generateManual() {
+            const name = this.manualName.trim();
+            if (name.length < 3) {
+                this.manualResult = { show: true, success: false, message: 'Digite um nome com pelo menos 3 caracteres.', downloadUrl: '', previewUrl: '' };
+                return;
+            }
+            this.manualLoading = true;
+            this.manualResult = { show: false, success: false, message: '', downloadUrl: '', previewUrl: '' };
+            try {
+                const res = await fetch('/admin/api/generate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name }),
+                });
+                const data = await res.json();
+                if (data.success) {
+                    this.manualResult = {
+                        show: true,
+                        success: true,
+                        message: data.message,
+                        downloadUrl: data.download_url,
+                        previewUrl: data.preview_url,
+                    };
+                    this.manualName = '';
+                    await this.loadRegistrations();
+                } else {
+                    this.manualResult = { show: true, success: false, message: data.message || 'Erro ao gerar.', downloadUrl: '', previewUrl: '' };
+                }
+            } catch (err) {
+                this.manualResult = { show: true, success: false, message: 'Erro de conexão.', downloadUrl: '', previewUrl: '' };
+            } finally {
+                this.manualLoading = false;
             }
         },
 

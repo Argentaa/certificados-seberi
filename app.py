@@ -553,6 +553,47 @@ def api_list_registrations():
     })
 
 
+@app.route("/admin/api/generate", methods=["POST"])
+@require_admin
+def api_generate_certificate():
+    """Gera certificado manualmente pelo painel admin."""
+    data = request.get_json()
+    if not data:
+        return jsonify({"success": False, "message": "Dados inválidos."}), 400
+
+    name = (data.get("name") or "").strip().upper()
+    if not name or len(name) < 3:
+        return jsonify({"success": False, "message": "Nome deve ter pelo menos 3 caracteres."}), 400
+
+    # Cria registro
+    reg = Registration(name=name, email=f"manual-{uuid.uuid4().hex[:8]}@admin")
+    db.session.add(reg)
+    db.session.commit()
+
+    # Gera certificado
+    cert_path, error = generate_certificate(reg)
+    if error:
+        reg.status = "failed"
+        db.session.commit()
+        return jsonify({"success": False, "message": f"Erro: {error}"}), 500
+
+    relative_path = os.path.relpath(cert_path, app.root_path)
+    reg.certificate_file = relative_path
+    reg.status = "completed"
+    reg.sent_count = 1
+    reg.sent_at = datetime.utcnow()
+    db.session.commit()
+
+    filename = os.path.basename(cert_path)
+    return jsonify({
+        "success": True,
+        "message": f"Certificado gerado para {name}!",
+        "reg": reg.to_dict(),
+        "download_url": url_for("download_certificate", filename=filename),
+        "preview_url": url_for("preview_certificate", filename=filename),
+    })
+
+
 @app.route("/admin/api/delete/<int:reg_id>", methods=["DELETE"])
 @require_admin
 def api_delete_registration(reg_id):
